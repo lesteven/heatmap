@@ -25,11 +25,12 @@ function getData(url){
 }
 function drawGraph(data){
 	//variable holding svg attributes
-	const margin ={top:50,bottom:50,left:50,right:50}
+	const margin ={top:50,bottom:100,left:50,right:50}
 	const width = 950;
 	const height = 450;
 	const innerHeight = height - margin.top - margin.bottom;
 	const innerWidth = width - margin.left - margin.right;
+	const secondHeight = innerHeight -margin.bottom;
 
 	//creates svg
 	let svg = select('body')
@@ -40,12 +41,18 @@ function drawGraph(data){
 		.append('g').attr('transform','translate('
 			+ margin.left + ',' + margin.top + ')');
 
+	//set grid width and height
+	const last = data.monthlyVariance.length -1;
+	const years = data.monthlyVariance[last].year - data.monthlyVariance[0].year;
+	const gridWidth = innerWidth/years
+	const gridHeight = innerHeight/(12-1)
+
 	//set ranges
 	let xScale = scaleLinear()
 		.range([0,innerWidth]);
 
 	let yScale = scaleLinear()
-		.range([innerHeight,0]);
+		.range([innerHeight-gridHeight,0]);
 	
 	//set domain
 	xScale.domain(extent(data.monthlyVariance,d=>{return d.year}))
@@ -53,24 +60,13 @@ function drawGraph(data){
 	const yDomain = extent(data.monthlyVariance,d=>{return d.month})
 	yScale.domain(swap(yDomain))
 
-	console.log(xScale.domain(),yScale.domain())
+	console.log(xScale.domain(),yScale.domain()) 
 
-	//add x and y axis
-	svg.append('g')
-		.attr('class','x-axis')
-		.attr('transform','translate(0,'+ innerHeight +')')
-		.call(axisBottom(xScale));
-
-	svg.append('g')
-		.attr('class','x-axis')
-		.call(axisLeft(yScale));
-
-	const last = data.monthlyVariance.length -1;
-	const years = data.monthlyVariance[last].year - data.monthlyVariance[0].year;
-	const gridWidth = innerWidth/years
-	const gridHeight = innerHeight/(yScale.domain()[0]-1)
 	const color = ['purple','blue','green','teal','#ffff4c','#ffffcc',
 					'#ffd27f','#ffae19','#ff4c4c','#ff0000','#990000']
+	const month =["January","February","March","April","May",
+						"June","July","August","September","October",
+						"November","December"]
 	console.log(gridWidth,gridHeight)
 	
 	//shows data on mousehover
@@ -90,9 +86,9 @@ function drawGraph(data){
 				div.transition()
 					.duration(200)
 					.style("opacity",.9)
-				div.html(d.year + " " + d.month +" "+ d.variance)
-					.style("left",(200)+"px")
-					.style("top",(100)+"px")
+				div.html(d.year + " " + month[d.month-1] +" "+ d.variance)
+					.style("left",(event.pageX -70)+"px")
+					.style("top",(event.pageY-70)+"px")
 				
 			})
 			.on("mouseout",function(d){
@@ -101,6 +97,15 @@ function drawGraph(data){
 					.style("opacity",0)
 			})
 
+	//add x and y axis
+	svg.append('g')
+		.attr('class','x-axis')
+		.attr('transform','translate(0,'+ innerHeight +')')
+		.call(axisBottom(xScale));
+	
+	svg.append('g')
+		.attr('class','y-axis')
+		.call(axisLeft(yScale));
 
 }
 function swap(x){

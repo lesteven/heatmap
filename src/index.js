@@ -25,12 +25,11 @@ function getData(url){
 }
 function drawGraph(data){
 	//variable holding svg attributes
-	const margin ={top:50,bottom:100,left:50,right:50}
+	const margin ={top:50,bottom:70,left:70,right:50}
 	const width = 950;
 	const height = 450;
 	const innerHeight = height - margin.top - margin.bottom;
 	const innerWidth = width - margin.left - margin.right;
-	const secondHeight = innerHeight -margin.bottom;
 
 	//creates svg
 	let svg = select('body')
@@ -42,8 +41,8 @@ function drawGraph(data){
 			+ margin.left + ',' + margin.top + ')');
 
 	//set grid width and height
-	const last = data.monthlyVariance.length -1;
-	const years = data.monthlyVariance[last].year - data.monthlyVariance[0].year;
+	const dataLength = data.monthlyVariance.length -1;
+	const years = data.monthlyVariance[dataLength].year - data.monthlyVariance[0].year;
 	const gridWidth = innerWidth/years
 	const gridHeight = innerHeight/(12-1)
 
@@ -56,18 +55,17 @@ function drawGraph(data){
 	
 	//set domain
 	xScale.domain(extent(data.monthlyVariance,d=>{return d.year}))
-	
 	const yDomain = extent(data.monthlyVariance,d=>{return d.month})
 	yScale.domain(swap(yDomain))
 
-	console.log(xScale.domain(),yScale.domain()) 
+	//console.log(xScale.domain(),yScale.domain()) 
 
 	const color = ['purple','blue','green','teal','#ffff4c','#ffffcc',
 					'#ffd27f','#ffae19','#ff4c4c','#ff0000','#990000']
 	const month =["January","February","March","April","May",
 						"June","July","August","September","October",
 						"November","December"]
-	console.log(gridWidth,gridHeight)
+	//console.log(gridWidth,gridHeight)
 	
 	//shows data on mousehover
 	let div = select("body").append("div")
@@ -105,8 +103,12 @@ function drawGraph(data){
 	
 	svg.append('g')
 		.attr('class','y-axis')
-		.call(axisLeft(yScale));
-
+		.attr('transform','translate(0,'+ gridHeight/2 +')')
+		.call(
+			axisLeft(yScale)
+				.tickSize(0)
+				.tickFormat(function(d){return month[d-1]})
+			)
 }
 function swap(x){
 	let temp = x[0];

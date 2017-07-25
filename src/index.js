@@ -19,13 +19,13 @@ function getData(url){
 	fetch(url)
 	.then(response=>response.json())
 	.then(data=>{
-		console.log(data)
+		//console.log(data)
 		drawGraph(data)
 	})
 }
 function drawGraph(data){
 	//variable holding svg attributes
-	const margin ={top:100,bottom:70,left:70,right:50}
+	const margin ={top:100,bottom:100,left:70,right:50}
 	const width = 950;
 	const height = 550;
 	const innerHeight = height - margin.top - margin.bottom;
@@ -97,8 +97,8 @@ function drawGraph(data){
 					.duration(100)
 					.style('opacity',.9)
 				div.html(d.year + ' ' + month[d.month-1] + '</br>' 
-					+ (data.baseTemperature + d.variance).toFixed(4) +' C'
-				 	+ '</br>' + d.variance + ' C')
+					+ 'T: ' + (data.baseTemperature + d.variance).toFixed(4) +' C'
+				 	+ '</br>' +'V: ' + d.variance + ' C')
 					.style('left',(event.pageX -50)+'px')
 					.style('top',(event.pageY-100)+'px')
 				
@@ -113,7 +113,10 @@ function drawGraph(data){
 	g.append('g')
 		.attr('class','x-axis')
 		.attr('transform','translate(0,'+ innerHeight +')')
-		.call(axisBottom(xScale));
+		.call(
+			axisBottom(xScale)
+				.tickFormat(format("d"))
+			);
 	
 	g.append('g')
 		.attr('class','y-axis')
@@ -146,7 +149,7 @@ function getDescription(svg,innerHeight,innerWidth,height){
 		.text('Ranking')
 	svg.append('text')
 		.attr('class','xAxis-des')
-		.attr('transform','translate('+(innerWidth/2 +50) + ','+ (height-20) +')')
+		.attr('transform','translate('+(innerWidth/2 +50) + ','+ (height-50) +')')
 		.text('Years')
 
 }
@@ -156,11 +159,11 @@ function addLegend(svg,color,colorScale,data){
 	
 	let legend = svg.append('g')
 		.attr('class','legend')
-	let j =600;
+	let j =550;
 	for(let i = 0; i < color.length; i++){
 		//console.log(j)
 		legend.append('rect')
-			.attr('width',30)
+			.attr('width',35)
 			.attr('height',15)
 			.style('fill',color[i])
 			.attr('transform','translate('+ j + ',510)' )
@@ -168,8 +171,6 @@ function addLegend(svg,color,colorScale,data){
 			.attr('class','legendText')
 			.attr('transform','translate('+ j + ',540)' )
 			.text(legendText[i])
-		j+=30;
-
+		j+=35;
 	}
-
 }

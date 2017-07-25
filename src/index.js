@@ -62,7 +62,7 @@ function drawGraph(data){
 
 	//console.log(xScale.domain(),yScale.domain()) 
 
-	const color = ['purple','blue','green','teal','#ffff4c','#ffffcc',
+	const color = ['purple','blue','green','#b2b266','#ffffb2','#ffffcc',
 					'#ffd27f','#ffae19','#ff4c4c','#ff0000','#990000']
 	const month =['January','February','March','April','May',
 						'June','July','August','September','October',
@@ -71,13 +71,13 @@ function drawGraph(data){
 	
 	//color scale
 	const variance = extent(data.monthlyVariance,d=>{return d.variance})
-	console.log(variance)
-	
+	//console.log(variance)
 	const colorScale = scaleQuantile()
 		.domain(variance)
 		.range(color)
 
-	console.log(colorScale.domain(),colorScale.range())
+	//console.log(colorScale.domain(),colorScale.range())
+	//console.log(colorScale.quantiles())
 	//shows data on mousehover
 	let div = select('body').append('div')
 		.attr('class','tooltip')
@@ -125,7 +125,7 @@ function drawGraph(data){
 			)
 
 	getDescription(svg,innerHeight,innerWidth,height)
-	addLegend(svg,color)
+	addLegend(svg,color,colorScale,data)
 }
 function swap(x){
 	let temp = x[0];
@@ -150,21 +150,24 @@ function getDescription(svg,innerHeight,innerWidth,height){
 		.text('Years')
 
 }
-function addLegend(svg,color){
+function addLegend(svg,color,colorScale,data){
+	let legendText = colorScale.quantiles().map(d=>(d += data.baseTemperature).toFixed(1))
+	legendText = [0].concat(legendText)
+	
 	let legend = svg.append('g')
 		.attr('class','legend')
-
-	let j =15;
+	let j =600;
 	for(let i = 0; i < color.length; i++){
 		//console.log(j)
 		legend.append('rect')
 			.attr('width',30)
 			.attr('height',15)
 			.style('fill',color[i])
-			.attr('transform','translate('+ j + ',10)' )
-		//legend.append('text')
-		//	.attr('transform','translate('+ j + ',40)' )
-		//	.text('1')
+			.attr('transform','translate('+ j + ',510)' )
+		legend.append('text')
+			.attr('class','legendText')
+			.attr('transform','translate('+ j + ',540)' )
+			.text(legendText[i])
 		j+=30;
 
 	}

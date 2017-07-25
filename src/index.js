@@ -5,7 +5,7 @@ import {
 	selection,
 	html} from 'd3-selection';
 import {timeParse} from 'd3-time-format';
-import {scaleLinear,scaleBand,scaleOrdinal} from 'd3-scale';
+import {scaleLinear,scaleQuantile} from 'd3-scale';
 import {range,extent,max} from 'd3-array';
 import {axisBottom,axisLeft} from 'd3-axis';
 import {transition} from 'd3-transition';
@@ -69,6 +69,15 @@ function drawGraph(data){
 						'November','December']
 	//console.log(gridWidth,gridHeight)
 	
+	//color scale
+	const variance = extent(data.monthlyVariance,d=>{return d.variance})
+	console.log(variance)
+	
+	const colorScale = scaleQuantile()
+		.domain(variance)
+		.range(color)
+
+	console.log(colorScale.domain(),colorScale.range())
 	//shows data on mousehover
 	let div = select('body').append('div')
 		.attr('class','tooltip')
@@ -82,6 +91,7 @@ function drawGraph(data){
 			.attr('y',function(d){return yScale(d.month)})
 			.attr('width', gridWidth)
 			.attr('height', gridHeight)
+			.style('fill',function(d){return colorScale(d.variance)})
 			.on('mouseover',function(d){
 				div.transition()
 					.duration(100)
@@ -124,36 +134,36 @@ function swap(x){
 	return x
 }
 function getDescription(svg,innerHeight,innerWidth,height){
-	console.log(innerHeight,height)
-	svg.append("text")
-		.attr("class","title")
-		.attr("x","30%")
-		.attr("y","10%")
-		.text("Monthly Global Land-Surface Temperature")
-	svg.append("text")
-		.attr("class","yAxis-des")
-		.attr("transform","translate(20,"+ (innerHeight-100) +") rotate(-90)")
-		.text("Ranking")
-	svg.append("text")
-		.attr("class","xAxis-des")
-		.attr("transform","translate("+(innerWidth/2 +50) + ","+ (height-20) +")")
-		.text("Years")
+	//console.log(innerHeight,height)
+	svg.append('text')
+		.attr('class','title')
+		.attr('x','30%')
+		.attr('y','10%')
+		.text('Monthly Global Land-Surface Temperature')
+	svg.append('text')
+		.attr('class','yAxis-des')
+		.attr('transform','translate(20,'+ (innerHeight-100) +') rotate(-90)')
+		.text('Ranking')
+	svg.append('text')
+		.attr('class','xAxis-des')
+		.attr('transform','translate('+(innerWidth/2 +50) + ','+ (height-20) +')')
+		.text('Years')
 
 }
 function addLegend(svg,color){
 	let legend = svg.append('g')
-		.attr("class","legend")
+		.attr('class','legend')
 
 	let j =15;
 	for(let i = 0; i < color.length; i++){
-		console.log(j)
-		legend.append("rect")
+		//console.log(j)
+		legend.append('rect')
 			.attr('width',30)
 			.attr('height',15)
-			.style("fill",color[i])
-			.attr("transform","translate("+ j + ",20)" )
-		//legend.append("text")
-		//	.attr("transform","translate("+ j + ",40)" )
+			.style('fill',color[i])
+			.attr('transform','translate('+ j + ',10)' )
+		//legend.append('text')
+		//	.attr('transform','translate('+ j + ',40)' )
 		//	.text('1')
 		j+=30;
 
